@@ -1,0 +1,62 @@
+basePath: /api
+definitions:
+  endpoints.HealthResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  endpoints.SumRequest:
+    properties:
+      numbers:
+        items:
+          type: number
+        type: array
+    required:
+      - numbers
+    type: object
+  endpoints.SumResponse:
+    properties:
+      result:
+        type: number
+    type: object
+info:
+  contact: {}
+  description: This is a sample server.
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+  title: Swagger Go API Server
+  version: '1.0'
+paths:
+  /health:
+    get:
+      description: This will return the health status of the server.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoints.HealthResponse'
+      summary: Health check
+  /math/sum:
+    post:
+      consumes:
+        - application/json
+      description: This will return the sum of the numbers.
+      parameters:
+        - description: Numbers to sum
+          in: body
+          name: numbers
+          required: true
+          schema:
+            $ref: '#/definitions/endpoints.SumRequest'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/endpoints.SumResponse'
+      summary: Sum numbers
+swagger: '2.0'

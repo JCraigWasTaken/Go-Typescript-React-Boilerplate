@@ -1,0 +1,20 @@
+{
+  "Components": {
+    "Calculator": {
+      "Calculate": "Calculer"
+    }
+  },
+  "Pages": {
+    "ErrorPage": {
+      "Error": "Erreur"
+    },
+    "HomePage": {
+      "API Status": "Statut de l'API",
+      "Client Calculator": "Calculateur de clientèle",
+      "Home": "Accueil",
+      "Not OK": "Non OK",
+      "OK": "OK",
+      "Server Calculator": "Calculateur de serveur"
+    }
+  }
+}

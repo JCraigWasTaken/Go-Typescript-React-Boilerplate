@@ -1,0 +1,56 @@
+{
+  "name": "go-typescript-react-boilerplate",
+  "workspaces": [
+    "src/client",
+    "src/server"
+  ],
+  "scripts": {
+    "setup": "npm install && gulp setup",
+    "dev:client": "gulp checkAPISchema && cd src/client && npm run start",
+    "dev:server": "gulp devBackend",
+    "test:unit:server": "gulp server:unit:test && gulp server:unit:coverage",
+    "test:unit:client": "cd src/client && cross-env CI=true npm run test && rimraf coverage",
+    "test:unit": "npm run test:unit:server && npm run test:unit:client",
+    "dev:test:e2e": "cypress open",
+    "test:e2e:stage1": "cd src/client && cross-env BROWSER=none npm run start",
+    "test:e2e:stage2": "run-p -r dev:server test:e2e:stage1",
+    "test:e2e:stage3": "cypress run",
+    "test:e2e:stage4": "delay 60 && npm run test:e2e:stage3",
+    "test:e2e": "start-server-and-test test:e2e:stage2 3000 test:e2e:stage4",
+    "test:formatting": "prettier --check . && gulp test:go:formatting",
+    "clean": "rimraf ./dist",
+    "build:apiSchema": "gulp build:apiSchema",
+    "build:client": "gulp build:apiSchema && cd src/client && npm run build && ncp ./build ../../dist && rimraf ./build && rimraf ./node_modules",
+    "build:server": "cross-env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./dist ./src/server",
+    "build": "npm run clean && npm run build:client && npm run build:server",
+    "container": "gulp container",
+    "format": "prettier --write . && gofmt -w .",
+    "precommit": "lint-staged"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.go": "gofmt -w",
+    "*.{js,jsx,ts,tsx,css,less,scss,html,json,gql,md,yml,angular,vue}": "prettier --write"
+  },
+  "devDependencies": {
+    "@types/cypress": "^1.1.3",
+    "cross-env": "^7.0.3",
+    "cypress": "^12.13.0",
+    "delay-cli": "^2.0.0",
+    "gulp": "^4.0.2",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-shell": "^0.8.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "ncp": "^2.0.0",
+    "npm-run-all": "^4.1.5",
+    "openapi-typescript-codegen": "^0.24.0",
+    "prettier": "^2.8.8",
+    "rimraf": "^5.0.1",
+    "start-server-and-test": "^2.0.0"
+  }
+}
