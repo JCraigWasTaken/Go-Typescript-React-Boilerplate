@@ -2,18 +2,18 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Box } from '@mui/material';
 import './App.scss';
-import HomeContainer from '../pages/HomePage/HomeContainer';
-import ErrorContainer from '../pages/ErrorPage/ErrorContainer';
+import HomePage from '../pages/HomePage/HomePage';
+import ErrorPage from '../pages/ErrorPage/ErrorPage';
 import { RecoilRoot } from 'recoil';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomeContainer />,
+    element: <HomePage />,
   },
   {
     path: '/*',
-    element: <ErrorContainer />,
+    element: <ErrorPage />,
   },
 ]);
 

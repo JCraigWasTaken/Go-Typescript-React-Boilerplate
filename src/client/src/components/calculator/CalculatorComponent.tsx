@@ -1,18 +1,14 @@
-import React from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import Hook, { IUseCalculatorProps } from './useCalculator';
 
-interface ICalculatorComponentProps {
-  valA: number;
-  valB: number;
-  setValA: (val: React.ChangeEvent<HTMLInputElement>) => void;
-  setValB: (val: React.ChangeEvent<HTMLInputElement>) => void;
-  onClick: () => void;
-  result: number;
-}
+export interface ICalculatorComponentProps extends IUseCalculatorProps {}
 
 function CalculatorComponent(props: ICalculatorComponentProps) {
-  const { t } = useTranslation();
+  const useCalculatorProps = {
+    onClick: props.onClick,
+  };
+  const { t, valA, valB, result, onChangeValA, onChangeValB, onClick } =
+    Hook.useCalculator(useCalculatorProps);
 
   return (
     <Box
@@ -24,26 +20,26 @@ function CalculatorComponent(props: ICalculatorComponentProps) {
     >
       <TextField
         label="A"
-        value={props.valA}
+        value={valA}
         type="number"
-        onChange={props.setValA}
+        onChange={onChangeValA}
         inputProps={{ 'data-testid': 'valueA-input' }}
       />
       <Typography variant="body1">+</Typography>
       <TextField
         label="B"
-        value={props.valB}
+        value={valB}
         type="number"
-        onChange={props.setValB}
+        onChange={onChangeValB}
         inputProps={{ 'data-testid': 'valueB-input' }}
       />
       <Typography variant="body1">=</Typography>
       <Typography variant="body1" data-testid="result-value">
-        {props.result}
+        {result}
       </Typography>
       <Button
         variant="contained"
-        onClick={props.onClick}
+        onClick={onClick}
         data-testid="calculate-button"
       >
         {t('Components:Calculator:Calculate')}

@@ -1,40 +1,87 @@
-// CalculatorComponent.test.tsx
-
 import { render, screen, fireEvent } from '@testing-library/react';
-import CalculatorComponent from './CalculatorComponent';
-import React from 'react';
 
-test('renders CalculatorComponent and checks functionality', () => {
-  const setValAMock = jest.fn();
-  const setValBMock = jest.fn();
-  const onClickMock = jest.fn();
+import CalculatorComponent, {
+  ICalculatorComponentProps,
+} from './CalculatorComponent';
+import Hook from './useCalculator';
 
-  render(
-    <CalculatorComponent
-      valA={1}
-      valB={2}
-      setValA={setValAMock}
-      setValB={setValBMock}
-      onClick={onClickMock}
-      result={3}
-    />
-  );
+// Default mock the props for the component
+const defaultMockProps: ICalculatorComponentProps = {
+  onClick: jest.fn(),
+};
+let mockProps = { ...defaultMockProps };
 
-  const valueAInput = screen.getByTestId('valueA-input');
-  const valueBInput = screen.getByTestId('valueB-input');
-  const calculateButton = screen.getByTestId('calculate-button');
-  const valueTypography = screen.getByTestId('result-value');
+// Default mock the hook return values
+const defaultMockHook = {
+  t: jest.fn(),
+  valA: '0',
+  valB: '0',
+  result: '0',
+  onChangeValA: jest.fn(),
+  onChangeValB: jest.fn(),
+  onClick: jest.fn(),
+};
+let mockHook = { ...defaultMockHook };
 
-  expect(valueAInput).toHaveValue(1);
-  expect(valueBInput).toHaveValue(2);
-  expect(valueTypography).toHaveTextContent('3');
+// Default mock all local subcomponents
 
-  fireEvent.change(valueAInput, { target: { value: '5' } });
-  expect(setValAMock).toHaveBeenCalledTimes(1);
+describe('CalculatorComponent', () => {
+  let hookSpy: jest.SpyInstance<any, any, any>;
+  // Setup and teardown functions
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockProps = { ...defaultMockProps };
+    mockHook = { ...defaultMockHook };
+    hookSpy = jest.spyOn(Hook, 'useCalculator');
+    hookSpy.mockImplementation(() => mockHook);
+    // Mock return values for each function that is in the props
+    mockProps.onClick = jest.fn().mockReturnValue(0);
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+    hookSpy.mockRestore();
+  });
 
-  fireEvent.change(valueBInput, { target: { value: '5' } });
-  expect(setValBMock).toHaveBeenCalledTimes(1);
+  // Tests
+  test('Should render the component with all vals in correct locations', () => {
+    render(<CalculatorComponent {...mockProps} />);
+    expect(screen.getByTestId('valueA-input')).toBeInTheDocument();
+    expect(screen.getByTestId('valueA-input')).toHaveValue(
+      parseFloat(mockHook.valA)
+    );
+    expect(screen.getByTestId('valueB-input')).toBeInTheDocument();
+    expect(screen.getByTestId('valueB-input')).toHaveValue(
+      parseFloat(mockHook.valB)
+    );
+    expect(screen.getByTestId('result-value')).toBeInTheDocument();
+    expect(screen.getByTestId('result-value')).toHaveTextContent(
+      mockHook.result
+    );
+    expect(screen.getByTestId('calculate-button')).toBeInTheDocument();
+  });
 
-  fireEvent.click(calculateButton);
-  expect(onClickMock).toHaveBeenCalledTimes(1);
+  test('Change value A should call setValA', () => {
+    render(<CalculatorComponent {...mockProps} />);
+    const input = screen.getByTestId('valueA-input');
+    fireEvent.change(input, { target: { value: '1' } });
+    jest.runAllTimers();
+    expect(mockHook.onChangeValA).toHaveBeenCalledTimes(1);
+  });
+
+  test('Change value B should call setValB', () => {
+    render(<CalculatorComponent {...mockProps} />);
+    const input = screen.getByTestId('valueB-input');
+    fireEvent.change(input, { target: { value: '1' } });
+    jest.runAllTimers();
+    expect(mockHook.onChangeValB).toHaveBeenCalledTimes(1);
+  });
+
+  test('Click calculate button should call onClick', () => {
+    render(<CalculatorComponent {...mockProps} />);
+    const button = screen.getByTestId('calculate-button');
+    fireEvent.click(button);
+    jest.runAllTimers();
+    expect(mockHook.onClick).toHaveBeenCalledTimes(1);
+  });
 });

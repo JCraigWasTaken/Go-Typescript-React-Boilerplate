@@ -7,8 +7,8 @@
   "scripts": {
     "setup": "npm install && gulp setup",
     "dev:client": "gulp checkAPISchema && cd src/client && npm run start",
-    "dev:server": "gulp devBackend",
-    "test:unit:server": "gulp server:unit:test && gulp server:unit:coverage",
+    "dev:server": "cd src/server && npm run dev:server",
+    "test:unit:server": "cd src/server && npm run test:unit:server",
     "test:unit:client": "cd src/client && cross-env CI=true npm run test && rimraf coverage",
     "test:unit": "npm run test:unit:server && npm run test:unit:client",
     "dev:test:e2e": "cypress open",
@@ -51,6 +51,7 @@
     "openapi-typescript-codegen": "^0.24.0",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
-    "start-server-and-test": "^2.0.0"
+    "start-server-and-test": "^2.0.0",
+    "typescript": "^5.0.4"
   }
 }

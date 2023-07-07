@@ -1,0 +1,7 @@
+{
+  "name": "server",
+  "scripts": {
+    "dev:server": "gulp server:dev",
+    "test:unit:server": "gulp server:unit:test && gulp server:unit:coverage"
+  }
+}

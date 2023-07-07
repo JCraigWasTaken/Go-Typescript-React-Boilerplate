@@ -2,5 +2,5 @@
   "compilerOptions": {
     "types": ["cypress"]
   },
-  "include": ["endpoints"]
+  "include": ["endpoints/*/*"]
 }
