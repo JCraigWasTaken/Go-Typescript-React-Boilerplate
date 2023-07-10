@@ -1,9 +1,9 @@
 //go:build !test
 // +build !test
 
-// @title Climate Bridge API
+// @title Application API
 // @version 1.0
-// @description The Climate Bridge API server for the Climate Bridge App.
+// @description The Application API server
 // @license.name MIT
 // @license.url http://opensource.org/licenses/MIT
 // @BasePath /api

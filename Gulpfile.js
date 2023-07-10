@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('gulp-shell');
 const { exec } = require('child_process');
+const spawn = require('cross-spawn');
 
 const runCommand = command => {
   return cb => {
@@ -115,7 +116,7 @@ gulp.task('container', function () {
   let repoName = process.env.GITHUB_REPOSITORY;
   const imageName = repoName
     ? `ghcr.io/${repoName}`.toLowerCase()
-    : 'climatebridge-app';
+    : 'application';
 
   return shell.task([`docker build --no-cache -t ${imageName}:${version} .`])();
 });
@@ -133,4 +134,76 @@ gulp.task('test:go:formatting', function (done) {
       done();
     }
   });
+});
+
+gulp.task('test:e2e:runClient', function (done) {
+  const env = Object.create(process.env);
+  env.BROWSER = 'none';
+
+  const client = spawn('npm', ['run', 'start'], {
+    env: env,
+    cwd: './src/client',
+    stdio: 'inherit',
+  });
+
+  client.on('exit', function (code) {
+    if (code !== 0) {
+      return done(new Error('Client exited with code ' + code));
+    }
+    done();
+  });
+});
+
+gulp.task('test:e2e:runClient', function (done) {
+  const env = Object.create(process.env);
+  env.BROWSER = 'none';
+
+  const client = spawn('npm', ['run', 'start'], {
+    env: env,
+    cwd: './src/client',
+    stdio: 'inherit',
+  });
+
+  client.on('exit', function (code) {
+    if (code !== 0) {
+      return done(new Error('Client exited with code ' + code));
+    }
+    done();
+  });
+});
+
+gulp.task('test:e2e:runServer', function (done) {
+  const server = spawn('npm', ['run', 'dev:server'], {
+    stdio: 'inherit',
+  });
+
+  server.on('exit', function (code) {
+    if (code !== 0) {
+      return done(new Error('Server exited with code ' + code));
+    }
+    done();
+  });
+});
+
+gulp.task(
+  'test:e2e:runApp',
+  gulp.parallel('test:e2e:runClient', 'test:e2e:runServer')
+);
+
+gulp.task('test:e2e:runTests', function (done) {
+  // Delay in milliseconds (60 seconds)
+  const delay = 60 * 1000;
+
+  setTimeout(function () {
+    const tests = spawn('cypress', ['run'], {
+      stdio: 'inherit',
+    });
+
+    tests.on('exit', function (code) {
+      if (code !== 0) {
+        return done(new Error('Tests exited with code ' + code));
+      }
+      done();
+    });
+  }, delay);
 });
