@@ -30,13 +30,17 @@ function useHomePage(props: IUseHomePageProps) {
     []
   );
 
+  const handlePageLoad = useCallback(async () => {
+    const result = await helper.pageLoad();
+    setApiStatus(result);
+  }, [setApiStatus]);
+
   // UseEffects
+
   useEffect(() => {
     // Page Load
-    helper.pageLoad().then(apiStatus => {
-      setApiStatus(apiStatus);
-    });
-  }, [setApiStatus]);
+    handlePageLoad();
+  }, [handlePageLoad]);
 
   // Return
   return {

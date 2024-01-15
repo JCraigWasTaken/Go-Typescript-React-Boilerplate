@@ -33,11 +33,20 @@ export const undefinedHandlers = [
   }),
 ];
 
-export const errorHandlers = [
+export const errorHandlers_APIDisconnect = [
   rest.get('/api/common/health', (_, res, ctx) => {
-    return res(ctx.status(500));
+    return res(ctx.status(504));
   }),
   rest.post('/api/common/sum', (_, res, ctx) => {
-    return res(ctx.status(500));
+    return res(ctx.status(504));
+  }),
+];
+
+export const errorHandlers_APIInternal = [
+  rest.get('/api/common/health', (_, res, ctx) => {
+    return res(ctx.json({ error: 'Error' }));
+  }),
+  rest.post('/api/common/sum', (_, res, ctx) => {
+    return res(ctx.json({ error: 'Error' }));
   }),
 ];

@@ -1,11 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 
-import {
-  successHandlers,
-  undefinedHandlers,
-  errorHandlers,
-} from '../../mocks/apiMock';
+import { successHandlers } from '../../mocks/apiMock';
 import Hook, { IUseErrorPageProps } from './useErrorPage';
 
 // Setup mock server
