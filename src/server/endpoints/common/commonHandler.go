@@ -25,6 +25,7 @@ type HealthResponse struct {
 // @Description This will return the health status of the server.
 // @Produce  json
 // @Success 200 {object} HealthResponse
+// @Failure default {object} structs.ErrorResponse
 // @Router /common/health [get]
 func (h *Handler) HealthCheck(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -53,6 +54,7 @@ type SumResponse struct {
 // @Produce  json
 // @Param numbers body SumRequest true "Numbers to sum"
 // @Success 200 {object} SumResponse
+// @Failure default {object} structs.ErrorResponse
 // @Router /common/sum [post]
 func (h *Handler) MathSum(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {

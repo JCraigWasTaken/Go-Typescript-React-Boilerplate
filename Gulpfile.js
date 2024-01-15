@@ -154,24 +154,6 @@ gulp.task('test:e2e:runClient', function (done) {
   });
 });
 
-gulp.task('test:e2e:runClient', function (done) {
-  const env = Object.create(process.env);
-  env.BROWSER = 'none';
-
-  const client = spawn('npm', ['run', 'start'], {
-    env: env,
-    cwd: './src/client',
-    stdio: 'inherit',
-  });
-
-  client.on('exit', function (code) {
-    if (code !== 0) {
-      return done(new Error('Client exited with code ' + code));
-    }
-    done();
-  });
-});
-
 gulp.task('test:e2e:runServer', function (done) {
   const server = spawn('npm', ['run', 'dev:server'], {
     stdio: 'inherit',

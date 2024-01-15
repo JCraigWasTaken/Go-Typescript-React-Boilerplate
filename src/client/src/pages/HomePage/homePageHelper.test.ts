@@ -1,9 +1,10 @@
 import { setupServer } from 'msw/node';
 
 import {
-  errorHandlers,
   successHandlers,
   undefinedHandlers,
+  errorHandlers_APIDisconnect,
+  errorHandlers_APIInternal,
 } from '../../mocks/apiMock';
 import helper from './homePageHelper';
 import { mock_endpointsCommon_SumResponse } from '../../mocks/apiResponseDataMock';
@@ -40,8 +41,13 @@ describe('homePageHelper', () => {
       const result = await helper.pageLoad();
       expect(result).toEqual('Not OK');
     });
-    test('should return "Not OK" if the API call is unsuccessful', async () => {
-      server.use(...errorHandlers);
+    test('should return "Not OK" if the API is disconnected', async () => {
+      server.use(...errorHandlers_APIDisconnect);
+      const result = await helper.pageLoad();
+      expect(result).toEqual('Not OK');
+    });
+    test('should return "Not OK" if the API has internal error', async () => {
+      server.use(...errorHandlers_APIInternal);
       const result = await helper.pageLoad();
       expect(result).toEqual('Not OK');
     });
@@ -58,8 +64,13 @@ describe('homePageHelper', () => {
       const result = await helper.handleCalculatorClick_Server([1, 2, 3]);
       expect(result).toEqual(0);
     });
-    test('should return 0 if the API call is unsuccessful', async () => {
-      server.use(...errorHandlers);
+    test('should return 0 if the API is disconnected', async () => {
+      server.use(...errorHandlers_APIDisconnect);
+      const result = await helper.handleCalculatorClick_Server([1, 2, 3]);
+      expect(result).toEqual(0);
+    });
+    test('should return 0 if the API has internal error', async () => {
+      server.use(...errorHandlers_APIInternal);
       const result = await helper.handleCalculatorClick_Server([1, 2, 3]);
       expect(result).toEqual(0);
     });

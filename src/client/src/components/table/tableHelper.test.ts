@@ -1,10 +1,6 @@
 import { setupServer } from 'msw/node';
 
-import {
-  errorHandlers,
-  successHandlers,
-  undefinedHandlers,
-} from '../../mocks/apiMock';
+import { successHandlers } from '../../mocks/apiMock';
 import helper, { ISortState } from './tableHelper';
 import {} from '../../mocks/apiResponseDataMock';
 import {
