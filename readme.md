@@ -68,9 +68,9 @@ This is a Boilerplate project for a full stack web application using Go, Typescr
 
 To start the app in development mode, use the following commands:
 
-- To start the client: `npm run dev:client`, it should be availabe at localhost:3000
+- To start the client: `npm run dev:client`, it should be available at localhost:3000
   - If you want to run the client without the server, you will need to run `npm run build:apiSchema` first to generate the api schema.
-- To start the server: `npm run dev:server`, it should be availabe at localhost:8080 however it will be proxied through the client so it is also available at localhost:3000
+- To start the server: `npm run dev:server`, it should be available at localhost:8080 however it will be proxied through the client so it is also available at localhost:3000
   - The server will automatically build the api schema when it starts.
 
 ## Building the Production App
