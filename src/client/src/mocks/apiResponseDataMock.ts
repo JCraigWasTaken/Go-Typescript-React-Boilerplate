@@ -31,3 +31,6 @@ export const mockEndpointResponses: IMockEndpointResponses = {
     },
   },
 };
+
+export const mock_endpointsCommon_SumResponse: go_typescript_react_boilerplate_src_server_endpoints_common_SumResponse =
+  mockEndpointResponses['/api/common/sum'].post;
