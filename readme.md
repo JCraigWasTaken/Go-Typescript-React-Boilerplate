@@ -22,7 +22,7 @@ This is a Boilerplate project for a full stack web application using Go, Typescr
 
 ## Development Requirements
 
-- Node.js (v18+ recommended)
+- Node.js (v24; the CI workflow runs v24)
 - NPM (v9+ recommended)
 - Golang (v1.20+ recommended)
 - Docker (v20+ recommended)
@@ -47,22 +47,10 @@ This is a Boilerplate project for a full stack web application using Go, Typescr
 
 ### Github Actions (If cloning this repo)
 
-1. Go to GitHub and sign into your account.
-2. Click on your profile picture in the top-right corner of the page.
-3. Select "Settings" from the dropdown menu.
-4. From the left-hand navigation, select "Developer settings".
-5. Select "Personal access tokens" from the left-hand navigation again.
-6. Click on the "Generate new token" -> "Generate new token (classic)" button.
-7. In the "Note" field, you can put a description for what this token will be used for, for example, "GitHub Actions Deployment".
-8. In the "Select scopes" section, check the boxes for the repo, read:packages, write:packages, and delete:packages scopes. This will give the token the necessary permissions to interact with repositories and manage packages.
-9. Click on the "Generate token" button at the bottom of the page.
-10. Navigate to the main page of the repository where you're setting up your workflow.
-11. Click on "Settings" in the navigation bar at the top of the page.
-12. From the left-hand navigation, select "Secrets and variables" -> "Actions".
-13. Click on the "New repository secret" button.
-14. Enter GH_TOKEN as the name for the secret in the "Name" field.
-15. In the "Value" field, paste the token that you generated in Steps 1-9.
-16. Click on the "Add secret" button.
+No setup or secrets are required. The workflow relies only on the built-in `GITHUB_TOKEN`:
+
+- Pull request checks (formatting, type checks, lint, unit tests with coverage gates, and Cypress e2e) run without any repository secrets, so fork PRs work out of the box.
+- Pushes to `main`/`dev` build the app, publish the container image to GitHub Container Registry, and verify the published image.
 
 ## Running the App in Development
 
@@ -106,6 +94,9 @@ To run unit tests, use the following commands:
 - For server unit tests: `npm run test:unit:server`
 - For client unit tests: `npm run test:unit:client`
 - For all unit tests: `npm run test:unit`
+- For type checks (client + server): `npm run test:types`
+- For lint (client): `npm run test:lint`
+- For formatting checks (prettier + gofmt): `npm run test:formatting`
 
 ## Running Cypress Tests
 
