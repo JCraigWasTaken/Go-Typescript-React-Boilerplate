@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const fs = require('fs');
 const path = require('path');
 const shell = require('gulp-shell');
-const { exec } = require('child_process');
+const { exec, execFileSync } = require('child_process');
 const spawn = require('cross-spawn');
 
 const runCommand = command => {
@@ -69,11 +69,14 @@ gulp.task('install-tools', function (done) {
       return;
     }
 
-    // Extract import paths and install tools
-    for (let line of importLines) {
+    // Extract import paths and install tools. execFileSync waits for each
+    // install to finish before the next runs, so a dependent task
+    // (build:apiSchema) never sees a half-installed toolchain.
+    for (const line of importLines) {
       const importPath = line.match(/_ "(.*)"/)[1];
-      const cmd = `go install ${importPath}@latest`;
-      shell.task(cmd)();
+      execFileSync('go', ['install', `${importPath}@latest`], {
+        stdio: 'inherit',
+      });
     }
 
     done();
