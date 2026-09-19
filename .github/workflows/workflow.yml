@@ -17,8 +17,12 @@ permissions:
 env:
   GO_VERSION: '1.20.4'
   NODE_VERSION: '24'
-  GOPATH: ${{ github.workspace }}/go
-  GOBIN: ${{ github.workspace }}/go/bin
+  # Keep Go's paths OUTSIDE the checkout. With GOPATH inside, `go install
+  # swag@latest` fills <checkout>/go/pkg/mod and `go build ./...` from the repo
+  # root walks into that cache, pulling in cached packages (e.g. purell) whose
+  # modules are not in this repo's go.sum. runner.temp is outside the checkout.
+  GOPATH: ${{ runner.temp }}/go
+  GOBIN: ${{ runner.temp }}/go/bin
 
 jobs:
   test:
