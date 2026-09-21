@@ -13,6 +13,10 @@ RUN ls -la /app
 # Set the DOCKER_ENV environment variable
 ENV DOCKER_ENV=true
 
+# Link the published image to this repository so the workflow's GITHUB_TOKEN
+# can push to GitHub Packages (ghcr.io) without a personal access token.
+LABEL org.opencontainers.image.source=https://github.com/JCraigWasTaken/Go-Typescript-React-Boilerplate
+
 # Expose port 8080
 EXPOSE 8080
 
