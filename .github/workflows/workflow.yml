@@ -7,90 +7,66 @@ on:
       - dev
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 env:
-  GO_VERSION: 1.20.4
-  NODE_VERSION: 18.14.2
-  GOPATH: ${{ github.workspace }}/go
-  GOBIN: ${{ github.workspace }}/go/bin
+  GO_VERSION: '1.20.4'
+  NODE_VERSION: '24'
 
 jobs:
-  setup-and-install-deps:
+  test:
+    name: Test (pull request)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 60
+    if: github.event_name ==
+      'pull_request' &&
+      (github.event.pull_request.base.ref == 'main' ||
+      github.event.pull_request.base.ref == 'dev')
+    permissions:
+      contents: read
     steps:
-      - name: Check if image exists
-        id: check_image
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}
-          VERSION=$(echo $GITHUB_SHA | cut -c1-7)
-          REPO_LOWER=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
-          TAG=${REPO_LOWER}:$VERSION
-
-          echo "${{ secrets.GH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker pull $TAG
-        continue-on-error: true
-
       - name: Checkout code
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Go
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+          cache: true
 
       - name: Setup Node.js
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Set GOPATH
-        if: steps.check_image.outcome == 'failure'
-        run: echo "GOPATH=$GOPATH" >> $GITHUB_ENV
-
-      - name: Add GOBIN to PATH
-        if: steps.check_image.outcome == 'failure'
-        run: echo "PATH=$(go env GOPATH)/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Clear npm cache
-        run: npm cache clean --force
-
-      - name: Check Node and npm versions
+      - name: Set Go paths (outside the checkout)
+        # Keep Go's paths OUTSIDE the checkout. With GOPATH inside, `go install
+        # swag@latest` fills <checkout>/go/pkg/mod and `go build ./...` from
+        # the repo root walks into that cache, pulling in cached packages
+        # (e.g. purell) whose modules are not in this repo's go.sum.
+        # $RUNNER_TEMP is outside the checkout; GITHUB_ENV exports the values
+        # to all later steps. (Set in a step because the runner context is
+        # not available in the workflow-level env: the file failed to load
+        # there, and actionlint does not allow it in a job-level env either.)
         run: |
+          echo "GOPATH=$RUNNER_TEMP/go" >> $GITHUB_ENV
+          echo "GOBIN=$RUNNER_TEMP/go/bin" >> $GITHUB_ENV
+          echo "PATH=$RUNNER_TEMP/go/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Show toolchain versions
+        run: |
+          go version
           node --version
           npm --version
 
-      - name: Install dependencies
-        if: steps.check_image.outcome == 'failure'
-        run: |
-          npm install
-          go mod tidy
-          gulp install-tools
-          npm list glob
-
-      - name: Cache Node modules
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Cache Go modules
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
       - name: Cache Go binaries
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.GOBIN }}
           key: ${{ runner.os }}-go-bin-${{ hashFiles('src/server/tools.go') }}
@@ -98,157 +74,129 @@ jobs:
             ${{ runner.os }}-go-bin-
 
       - name: Cache Cypress binary
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-cypress-
 
-  test:
-    needs: setup-and-install-deps
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && (github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'dev')
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Set GOPATH
-        run: echo "GOPATH=$GOPATH" >> $GITHUB_ENV
-
-      - name: Add GOBIN to PATH
-        run: echo "PATH=$GOBIN:$PATH" >> $GITHUB_ENV
-
-      - name: Restore Go modules from cache
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Restore Node modules from cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Restore Go binaries from cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.GOBIN }}
-          key: ${{ runner.os }}-go-bin-${{ hashFiles('src/server/tools.go') }}
-          restore-keys: |
-            ${{ runner.os }}-go-bin-
-
-      - name: Restore Cypress binary from cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-cypress-
-
-      - name: Run formatting tests
+      - name: Install dependencies
+        # npm ci verifies the committed lockfile; gulp install-tools installs
+        # the Go tool binaries pinned in src/server/tools.go (swag).
         run: |
-          ls -la
-          npm run test:formatting
-          wait
+          npm ci
+          gulp install-tools
+
+      - name: Build API schema
+        # Generates src/server/docs-autogenerated (swag) and
+        # src/client/src/api-autogenerated (openapi) from the Go source.
+        run: gulp build:apiSchema
+
+      - name: Verify Go dependencies
+        # go mod verify checks module checksums; go build proves the Go code
+        # compiles. Neither rewrites dependency files (unlike go mod tidy).
+        run: |
+          go mod verify
+          go build ./...
+
+      - name: Run formatting checks
+        run: npm run test:formatting
+
+      - name: Run type checks
+        run: npm run test:types
+
+      - name: Run lint
+        run: npm run test:lint
 
       - name: Run unit tests
-        run: |
-          npm run test:unit
-          wait
+        run: npm run test:unit
 
       - name: Run e2e tests
-        run: |
-          npm run test:e2e
-          wait
+        run: npm run test:e2e
 
   build:
-    needs: setup-and-install-deps
+    name: Build and publish image
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-
+    timeout-minutes: 45
+    if: github.event_name ==
+      'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Check if image exists
+        # Skips the build/publish steps when an image for this exact commit
+        # is already in the registry (e.g. a re-run of the same push).
         id: check_image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}
+          IMAGE_ID=ghcr.io/${{ github.repository }}
           VERSION=$(echo $GITHUB_SHA | cut -c1-7)
           REPO_LOWER=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
           TAG=${REPO_LOWER}:$VERSION
-
-          echo "${{ secrets.GH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # trap so the registry session is released even when the pull fails
+          # (image absent): under bash -eo pipefail a failing pull would
+          # abort the step before a bare `docker logout` could run.
+          trap 'docker logout ghcr.io' EXIT
           docker pull $TAG
         continue-on-error: true
 
       - name: Checkout code
         if: steps.check_image.outcome == 'failure'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Go
         if: steps.check_image.outcome == 'failure'
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+          cache: true
 
       - name: Setup Node.js
         if: steps.check_image.outcome == 'failure'
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: Set GOPATH
+      - name: Set Go paths (outside the checkout)
+        # Same rationale as the test job: Go's paths stay outside the
+        # checkout; set in a step because the runner context is not allowed
+        # in the workflow-level env.
         if: steps.check_image.outcome == 'failure'
-        run: echo "GOPATH=$GOPATH" >> $GITHUB_ENV
+        run: |
+          echo "GOPATH=$RUNNER_TEMP/go" >> $GITHUB_ENV
+          echo "GOBIN=$RUNNER_TEMP/go/bin" >> $GITHUB_ENV
+          echo "PATH=$RUNNER_TEMP/go/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Add GOBIN to PATH
+      - name: Cache Go binaries
         if: steps.check_image.outcome == 'failure'
-        run: echo "PATH=$(go env GOPATH)/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Restore Go modules from cache
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Restore Node modules from cache
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Restore Go binaries from cache
-        if: steps.check_image.outcome == 'failure'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.GOBIN }}
           key: ${{ runner.os }}-go-bin-${{ hashFiles('src/server/tools.go') }}
           restore-keys: |
             ${{ runner.os }}-go-bin-
 
+      - name: Install dependencies
+        if: steps.check_image.outcome == 'failure'
+        run: |
+          npm ci
+          gulp install-tools
+
+      - name: Build API schema
+        if: steps.check_image.outcome == 'failure'
+        run: gulp build:apiSchema
+
+      - name: Verify Go dependencies
+        if: steps.check_image.outcome == 'failure'
+        run: |
+          go mod verify
+          go build ./...
+
       - name: Build and containerize
+        if: steps.check_image.outcome == 'failure'
         run: |
           export REPO_NAME=$(echo ${{ github.repository }} | cut -d/ -f2 | tr '[:upper:]' '[:lower:]')
           npm run build
@@ -257,7 +205,7 @@ jobs:
 
       - name: Log in to GitHub Container Registry
         if: steps.check_image.outcome == 'failure'
-        run: echo "${{ secrets.GH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push to GitHub Packages
         if: steps.check_image.outcome == 'failure'
@@ -269,20 +217,22 @@ jobs:
           docker tag $REPO_LOWER:$VERSION $TAG
           docker push $TAG
           echo "Packages can be found in your github profile under packages"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  deploy:
+  verify-image:
+    name: Verify published image
+    # Pulls the image the build job published and inspects it. It does not
+    # deploy anything; the container is started by whoever pulls it.
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-
+    timeout-minutes: 15
+    if: github.event_name ==
+      'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    permissions:
+      contents: read
+      packages: read
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull and inspect image
         run: |
@@ -291,9 +241,9 @@ jobs:
           REPO_LOWER=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
           TAG=${REPO_LOWER}:$VERSION
           docker pull $TAG
+          docker image inspect $TAG --format 'verified image {{.Id}}'
           echo "The full image name and tag is: $TAG"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Log out from GitHub Container Registry
+        if: always()
         run: docker logout ghcr.io
