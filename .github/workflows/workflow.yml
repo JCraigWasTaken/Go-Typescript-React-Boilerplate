@@ -140,7 +140,6 @@ jobs:
           # abort the step before a bare `docker logout` could run.
           trap 'docker logout ghcr.io' EXIT
           docker pull $TAG
-          docker logout ghcr.io
         continue-on-error: true
 
       - name: Checkout code
