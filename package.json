@@ -4,6 +4,9 @@
     "src/client",
     "src/server"
   ],
+  "overrides": {
+    "bfj": "7.0.2"
+  },
   "scripts": {
     "setup": "npm install && gulp setup",
     "dev:client": "gulp checkAPISchema && cd src/client && npm run start",
