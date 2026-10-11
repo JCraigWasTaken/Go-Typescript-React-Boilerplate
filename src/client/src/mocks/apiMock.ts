@@ -1,54 +1,52 @@
 // mocks/handlers.js
-import { rest } from 'msw';
+import { http } from 'msw';
 import { mockEndpointResponses, setMockUndefined } from './apiResponseDataMock';
 
 export const successHandlers = [
-  rest.get('/api/common/health', (_, res, ctx) => {
+  http.get('/api/common/health', (_, res) => {
     try {
-      return res(ctx.json(mockEndpointResponses['/api/common/health'].get));
+      return res.json(mockEndpointResponses['/api/common/health'].get);
     } catch (e) {
-      return res(ctx.status(500));
+      return res.status(500);
     }
   }),
 
-  rest.post('/api/common/sum', async (_, res, ctx) => {
+  http.post('/api/common/sum', async (_, res) => {
     try {
-      return res(ctx.json(mockEndpointResponses['/api/common/sum'].post));
+      return res.json(mockEndpointResponses['/api/common/sum'].post);
     } catch (e) {
-      return res(ctx.status(500));
+      return res.status(500);
     }
   }),
 ];
 
 export const undefinedHandlers = [
-  rest.get('/api/common/health', (_, res, ctx) => {
-    return res(
-      ctx.json(
-        setMockUndefined(mockEndpointResponses['/api/common/health'].get)
-      )
+  http.get('/api/common/health', (_, res) => {
+    return res.json(
+      setMockUndefined(mockEndpointResponses['/api/common/health'].get)
     );
   }),
-  rest.post('/api/common/sum', async (_, res, ctx) => {
-    return res(
-      ctx.json(setMockUndefined(mockEndpointResponses['/api/common/sum'].post))
+  http.post('/api/common/sum', async (_, res) => {
+    return res.json(
+      setMockUndefined(mockEndpointResponses['/api/common/sum'].post)
     );
   }),
 ];
 
 export const errorHandlers_APIDisconnect = [
-  rest.get('/api/common/health', (_, res, ctx) => {
-    return res(ctx.status(504));
+  http.get('/api/common/health', (_, res) => {
+    return res.status(504);
   }),
-  rest.post('/api/common/sum', (_, res, ctx) => {
-    return res(ctx.status(504));
+  http.post('/api/common/sum', (_, res) => {
+    return res.status(504);
   }),
 ];
 
 export const errorHandlers_APIInternal = [
-  rest.get('/api/common/health', (_, res, ctx) => {
-    return res(ctx.json({ error: 'Error' }));
+  http.get('/api/common/health', (_, res) => {
+    return res.json({ error: 'Error' });
   }),
-  rest.post('/api/common/sum', (_, res, ctx) => {
-    return res(ctx.json({ error: 'Error' }));
+  http.post('/api/common/sum', (_, res) => {
+    return res.json({ error: 'Error' });
   }),
 ];
