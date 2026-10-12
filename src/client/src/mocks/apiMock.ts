@@ -1,52 +1,52 @@
 // mocks/handlers.js
-import { http } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { mockEndpointResponses, setMockUndefined } from './apiResponseDataMock';
 
 export const successHandlers = [
-  http.get('/api/common/health', (_, res) => {
+  http.get('/api/common/health', () => {
     try {
-      return res.json(mockEndpointResponses['/api/common/health'].get);
+      return HttpResponse.json(mockEndpointResponses['/api/common/health'].get);
     } catch (e) {
-      return res.status(500);
+      return new HttpResponse(null, { status: 500 });
     }
   }),
 
-  http.post('/api/common/sum', async (_, res) => {
+  http.post('/api/common/sum', async () => {
     try {
-      return res.json(mockEndpointResponses['/api/common/sum'].post);
+      return HttpResponse.json(mockEndpointResponses['/api/common/sum'].post);
     } catch (e) {
-      return res.status(500);
+      return new HttpResponse(null, { status: 500 });
     }
   }),
 ];
 
 export const undefinedHandlers = [
-  http.get('/api/common/health', (_, res) => {
-    return res.json(
+  http.get('/api/common/health', () => {
+    return HttpResponse.json(
       setMockUndefined(mockEndpointResponses['/api/common/health'].get)
     );
   }),
-  http.post('/api/common/sum', async (_, res) => {
-    return res.json(
+  http.post('/api/common/sum', async () => {
+    return HttpResponse.json(
       setMockUndefined(mockEndpointResponses['/api/common/sum'].post)
     );
   }),
 ];
 
 export const errorHandlers_APIDisconnect = [
-  http.get('/api/common/health', (_, res) => {
-    return res.status(504);
+  http.get('/api/common/health', () => {
+    return new HttpResponse(null, { status: 504 });
   }),
-  http.post('/api/common/sum', (_, res) => {
-    return res.status(504);
+  http.post('/api/common/sum', () => {
+    return new HttpResponse(null, { status: 504 });
   }),
 ];
 
 export const errorHandlers_APIInternal = [
-  http.get('/api/common/health', (_, res) => {
-    return res.json({ error: 'Error' });
+  http.get('/api/common/health', () => {
+    return HttpResponse.json({ error: 'Error' });
   }),
-  http.post('/api/common/sum', (_, res) => {
-    return res.json({ error: 'Error' });
+  http.post('/api/common/sum', () => {
+    return HttpResponse.json({ error: 'Error' });
   }),
 ];
