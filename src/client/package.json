@@ -3,7 +3,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --coverage",
+    "test": "react-scripts test --env=./testEnvironment.js --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

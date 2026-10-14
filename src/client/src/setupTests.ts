@@ -18,5 +18,16 @@ Object.assign(globalThis, {
   BroadcastChannel,
 });
 
+// testEnvironment.js (wired via `react-scripts test --env`) stashes the Node
+// runtime's native fetch APIs on __nodeWebApis. react-app-polyfill's
+// whatwg-fetch (XHR-based) overwrote them after the environment constructor
+// ran, so restore them here: msw 2 reads mocked response bodies through
+// these globals, and the XHR-based polyfill returns empty bodies.
+const nodeWebApis = (globalThis as { __nodeWebApis?: Record<string, unknown> })
+  .__nodeWebApis;
+if (nodeWebApis) {
+  Object.assign(globalThis, nodeWebApis);
+}
+
 console.error = jest.fn();
 console.warn = jest.fn();
