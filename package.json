@@ -35,7 +35,7 @@
     "@types/cypress": "^1.1.6",
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.6",
-    "cypress": "^12.17.4",
+    "cypress": "^13.17.0",
     "gulp": "^4.0.2",
     "gulp-nodemon": "^2.5.0",
     "gulp-shell": "^0.8.0",
