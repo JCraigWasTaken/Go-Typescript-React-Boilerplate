@@ -24,7 +24,7 @@ This is a Boilerplate project for a full stack web application using Go, Typescr
 
 - Node.js (v24; the CI workflow runs v24)
 - NPM (v9+ recommended)
-- Golang (v1.20+ recommended)
+- Golang (v1.27; the CI workflow runs v1.27.3)
 - Docker (v20+ recommended)
 - Visual Studio Code
 - Golang Extension for Visual Studio Code
