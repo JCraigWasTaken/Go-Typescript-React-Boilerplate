@@ -5,7 +5,8 @@
     "src/server"
   ],
   "overrides": {
-    "bfj": "7.0.2"
+    "bfj": "7.0.2",
+    "gulp": "$gulp"
   },
   "scripts": {
     "setup": "npm install && gulp setup",
@@ -44,7 +45,7 @@
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",
     "cypress": "^15.21.1",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "gulp-nodemon": "^2.5.0",
     "gulp-shell": "^0.8.0",
     "husky": "^8.0.3",
