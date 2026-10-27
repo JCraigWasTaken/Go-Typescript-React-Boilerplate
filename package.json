@@ -6,7 +6,8 @@
   ],
   "overrides": {
     "bfj": "7.0.2",
-    "gulp": "$gulp"
+    "gulp": "$gulp",
+    "nodemon": "3.1.14"
   },
   "scripts": {
     "setup": "npm install && gulp setup",
