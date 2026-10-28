@@ -1,8 +1,6 @@
-import { useCallback, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { apiHealthStatusAtom } from '../../state/atoms';
 import helper from './homePageHelper';
 
 export interface IUseHomePageProps {}
@@ -12,7 +10,7 @@ function useHomePage(props: IUseHomePageProps) {
   // Props
 
   // State
-  const [apiStatus, setApiStatus] = useRecoilState(apiHealthStatusAtom);
+  const [apiStatus, setApiStatus] = useState<string>('LOADING...');
 
   // Callbacks
 

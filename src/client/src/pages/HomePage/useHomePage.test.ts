@@ -1,5 +1,4 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { RecoilRoot } from 'recoil';
 
 import Hook, { IUseHomePageProps } from './useHomePage';
 import { mockUseTranslation } from '../../mocks/commonMock';
@@ -67,9 +66,7 @@ describe('useHomePage', () => {
   // UseEffect Tests
   describe('useEffect - Page Load', () => {
     test('should call helper.pageLoad with the correct arguments and update apiStatus', async () => {
-      const { result } = renderHook(() => Hook.useHomePage(mockProps), {
-        wrapper: RecoilRoot,
-      });
+      const { result } = renderHook(() => Hook.useHomePage(mockProps));
       await waitFor(() => {
         expect(result.current.apiStatus).toBe('OK');
       });
@@ -81,9 +78,7 @@ describe('useHomePage', () => {
 
   describe('handleCalculatorClick_Client', () => {
     test('should call helper.handleCalculatorClick_Client with the correct arguments and return the correct value', async () => {
-      const { result } = renderHook(() => Hook.useHomePage(mockProps), {
-        wrapper: RecoilRoot,
-      });
+      const { result } = renderHook(() => Hook.useHomePage(mockProps));
       const args = {
         valA: 1,
         valB: 2,
@@ -106,9 +101,7 @@ describe('useHomePage', () => {
 
   describe('handleCalculatorClick_Server', () => {
     test('should call helper.handleCalculatorClick_Server with the correct arguments and return the correct value', async () => {
-      const { result } = renderHook(() => Hook.useHomePage(mockProps), {
-        wrapper: RecoilRoot,
-      });
+      const { result } = renderHook(() => Hook.useHomePage(mockProps));
       const args = {
         valA: 2,
         valB: 2,
