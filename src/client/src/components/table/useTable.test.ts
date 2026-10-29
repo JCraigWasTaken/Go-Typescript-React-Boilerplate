@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import Hook, { IUseTableProps } from './useTable';
 import helper from './tableHelper';

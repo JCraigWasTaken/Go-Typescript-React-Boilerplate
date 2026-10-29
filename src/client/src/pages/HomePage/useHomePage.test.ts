@@ -4,7 +4,7 @@ import Hook, { IUseHomePageProps } from './useHomePage';
 import { mockUseTranslation } from '../../mocks/commonMock';
 import helper from './homePageHelper';
 import { TTableArgs } from '../../typescript/ITCommon';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 // Default mock the props for the hook
 export const defaultMockProps: IUseHomePageProps = {};
