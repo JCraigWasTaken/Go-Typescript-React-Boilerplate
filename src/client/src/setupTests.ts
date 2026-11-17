@@ -1,33 +1,19 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
+import { expect, vi } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+// jest-dom adds custom matchers for asserting on DOM nodes.
 // allows you to do things like:
 // expect(element).toHaveTextContent('react');
 // learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'util';
-import { ReadableStream, TransformStream, WritableStream } from 'stream/web';
-import { BroadcastChannel } from 'worker_threads';
+// Registered through the standalone matchers (the package's own /vitest
+// entry sits hoisted at the workspace root and cannot resolve 'vitest'
+// there); the matcher types come from src/jest-dom-vitest.d.ts.
+expect.extend(matchers);
 
-// msw 2 requires web APIs that the jsdom test environment does not
-// provide (msw 1.x-to-2.x migration guide).
-Object.assign(globalThis, {
-  TextDecoder,
-  TextEncoder,
-  ReadableStream,
-  TransformStream,
-  WritableStream,
-  BroadcastChannel,
-});
+// The CRA-era fixes here (testEnvironment.js + the __nodeWebApis restore)
+// existed only to undo react-app-polyfill's whatwg-fetch install. Vitest's
+// jsdom environment keeps Node's native fetch/streams/TextEncoder globals,
+// which is what msw 2 needs, so they are gone (issue #18).
 
-// testEnvironment.js (wired via `react-scripts test --env`) stashes the Node
-// runtime's native fetch APIs on __nodeWebApis. react-app-polyfill's
-// whatwg-fetch (XHR-based) overwrote them after the environment constructor
-// ran, so restore them here: msw 2 reads mocked response bodies through
-// these globals, and the XHR-based polyfill returns empty bodies.
-const nodeWebApis = (globalThis as { __nodeWebApis?: Record<string, unknown> })
-  .__nodeWebApis;
-if (nodeWebApis) {
-  Object.assign(globalThis, nodeWebApis);
-}
-
-console.error = jest.fn();
-console.warn = jest.fn();
+console.error = vi.fn();
+console.warn = vi.fn();

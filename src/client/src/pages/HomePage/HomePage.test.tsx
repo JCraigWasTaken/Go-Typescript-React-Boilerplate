@@ -1,3 +1,5 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import HomePage, { IHomePageProps } from './HomePage';
@@ -11,32 +13,32 @@ let mockProps = { ...defaultMockProps };
 const defaultMockHook = {
   t: (key: string) => key,
   apiStatus: 'OK',
-  getEquationTable: jest.fn(),
-  handleCalculatorClick_Client: jest.fn(),
-  handleCalculatorClick_Server: jest.fn(),
+  getEquationTable: vi.fn(),
+  handleCalculatorClick_Client: vi.fn(),
+  handleCalculatorClick_Server: vi.fn(),
 };
 let mockHook = { ...defaultMockHook };
 
 // Default mock all local subcomponents
-jest.mock('../../components/calculator/CalculatorComponent', () => ({
+vi.mock('../../components/calculator/CalculatorComponent', () => ({
   __esModule: true,
   default: () => <div>CalculatorComponent</div>, // A mock replacement of the CalculatorComponent
 }));
 
 describe('HomePage', () => {
-  let hookSpy: jest.SpyInstance<any, any, any>;
+  let hookSpy: MockInstance<any>;
   // Setup and teardown functions
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockProps = { ...defaultMockProps };
     mockHook = { ...defaultMockHook };
-    hookSpy = jest.spyOn(Hook, 'useHomePage');
+    hookSpy = vi.spyOn(Hook, 'useHomePage');
     hookSpy.mockImplementation(() => mockHook);
     // Mock return values for each function that is in the props
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     hookSpy.mockRestore();
   });
 

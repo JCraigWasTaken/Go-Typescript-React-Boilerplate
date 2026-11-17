@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 export const mockChangeEvent = (
   newValue: string | number
 ): React.ChangeEvent<HTMLInputElement> => {
@@ -20,8 +21,8 @@ export const mockMouseEvent = (
       id: targetId,
       getAttribute: (key: string) => (attributes ? attributes[key] : null),
     } as HTMLSpanElement,
-    preventDefault: jest.fn(),
-    stopPropagation: jest.fn(),
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
   } as any;
 };
 

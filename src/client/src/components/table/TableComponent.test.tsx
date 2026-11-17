@@ -1,3 +1,5 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import { defaultMockProps as useTableProps } from './useTable.test';
@@ -25,29 +27,29 @@ const defaultMockHook = {
     rows: [] as Array<{ id: number; name: string }>,
     totalCount: 0,
   },
-  onChangeSort: jest.fn(),
-  onChangePage: jest.fn(),
-  onChangeRowsPerPage: jest.fn(),
+  onChangeSort: vi.fn(),
+  onChangePage: vi.fn(),
+  onChangeRowsPerPage: vi.fn(),
 };
 let mockHook = { ...defaultMockHook };
 
 // Default mock all local subcomponents
 
 describe('TableComponent', () => {
-  let hookSpy: jest.SpyInstance<any, any, any>;
+  let hookSpy: MockInstance<any>;
   // Setup and teardown functions
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockProps = { ...defaultMockProps };
     mockHook = { ...defaultMockHook };
-    hookSpy = jest.spyOn(Hook, 'useTable');
+    hookSpy = vi.spyOn(Hook, 'useTable');
     hookSpy.mockImplementation(() => mockHook);
     // Mock return values for each function that is in the props
-    mockProps.onChangeTableState = jest.fn().mockResolvedValue([[], 0]);
+    mockProps.onChangeTableState = vi.fn().mockResolvedValue([[], 0]);
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     hookSpy.mockRestore();
   });
 
@@ -104,7 +106,7 @@ describe('TableComponent', () => {
       ];
       mockHook.rowsState.totalCount = 1;
       render(<TableComponent {...mockProps} />);
-      jest.runAllTimers();
+      vi.runAllTimers();
       expect(screen.getByTestId('table-body')).toBeInTheDocument();
       mockHook.rowsState.rows.forEach((row, rowIndex) => {
         expect(screen.getByTestId(`table-row-${rowIndex}`)).toBeInTheDocument();

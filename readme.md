@@ -6,6 +6,8 @@ This is a Boilerplate project for a full stack web application using Go, Typescr
 
 - A Go server with a REST API, the source code is located in the `src/server` directory.
 - A React client, the source code is located in the `src/client` directory.
+  It is built and served in development with Vite, and its unit tests run on
+  Vitest.
 - Cypress for end-to-end testing.
 - A Dockerfile for containerization.
 - A Github Actions workflow for CI/CD.

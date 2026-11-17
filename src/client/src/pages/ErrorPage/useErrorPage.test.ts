@@ -1,3 +1,13 @@
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+  vi,
+} from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 
@@ -20,15 +30,15 @@ describe('useErrorPage', () => {
     server.close();
   });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     server.resetHandlers();
     server.use(...successHandlers);
     mockProps = { ...defaultMockProps };
     // Mock return values for each function that is in the props
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // UseEffect Tests

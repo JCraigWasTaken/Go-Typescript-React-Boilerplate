@@ -1,3 +1,13 @@
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+  vi,
+} from 'vitest';
 import { setupServer } from 'msw/node';
 
 import { successHandlers } from '../../mocks/apiMock';
@@ -21,12 +31,12 @@ describe('tableHelper', () => {
     server.close();
   });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     server.resetHandlers();
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Tests
@@ -151,7 +161,9 @@ describe('tableHelper', () => {
         totalCount: 2,
       };
       const sortableColumnHeaderIDs = ['columnA', 'columnB', 'columnC'];
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       helper.tableDataValidation(
         columnHeaders,
         rowsState,
@@ -172,7 +184,9 @@ describe('tableHelper', () => {
         totalCount: 2,
       };
       const sortableColumnHeaderIDs = ['columnA', 'columnB'];
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       helper.tableDataValidation(
         columnHeaders,
         rowsState,

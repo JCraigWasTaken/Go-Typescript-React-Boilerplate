@@ -1,3 +1,13 @@
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+  vi,
+} from 'vitest';
 import { setupServer } from 'msw/node';
 
 import { successHandlers } from '../../mocks/apiMock';
@@ -15,12 +25,12 @@ describe('calculatorHelper', () => {
     server.close();
   });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     server.resetHandlers();
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Tests
@@ -29,7 +39,7 @@ describe('calculatorHelper', () => {
       // Arrange
       const valA = 1;
       const valB = 2;
-      const onClick = jest.fn().mockResolvedValue(3);
+      const onClick = vi.fn().mockResolvedValue(3);
 
       // Act
       await helper.handleClick(valA, valB, onClick);
