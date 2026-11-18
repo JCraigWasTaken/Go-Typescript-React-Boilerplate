@@ -1,3 +1,5 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import ErrorPage, { IErrorPageProps } from './ErrorPage';
@@ -16,19 +18,19 @@ let mockHook = { ...defaultMockHook };
 // Default mock all local subcomponents
 
 describe('ErrorPage', () => {
-  let hookSpy: jest.SpyInstance<any, any, any>;
+  let hookSpy: MockInstance<any>;
   // Setup and teardown functions
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockProps = { ...defaultMockProps };
     mockHook = { ...defaultMockHook };
-    hookSpy = jest.spyOn(Hook, 'useErrorPage');
+    hookSpy = vi.spyOn(Hook, 'useErrorPage');
     hookSpy.mockImplementation(() => mockHook);
     // Mock return values for each function that is in the props
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     hookSpy.mockRestore();
   });
 

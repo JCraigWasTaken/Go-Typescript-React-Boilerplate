@@ -140,11 +140,7 @@ gulp.task('test:go:formatting', function (done) {
 });
 
 gulp.task('test:e2e:runClient', function (done) {
-  const env = Object.create(process.env);
-  env.BROWSER = 'none';
-
   const client = spawn('npm', ['run', 'start'], {
-    env: env,
     cwd: './src/client',
     stdio: 'inherit',
   });

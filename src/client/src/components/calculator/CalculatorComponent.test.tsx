@@ -1,3 +1,5 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import CalculatorComponent, {
@@ -7,39 +9,39 @@ import Hook from './useCalculator';
 
 // Default mock the props for the component
 const defaultMockProps: ICalculatorComponentProps = {
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 let mockProps = { ...defaultMockProps };
 
 // Default mock the hook return values
 const defaultMockHook = {
-  t: jest.fn(),
+  t: vi.fn(),
   valA: '0',
   valB: '0',
   result: '0',
-  onChangeValA: jest.fn(),
-  onChangeValB: jest.fn(),
-  onClick: jest.fn(),
+  onChangeValA: vi.fn(),
+  onChangeValB: vi.fn(),
+  onClick: vi.fn(),
 };
 let mockHook = { ...defaultMockHook };
 
 // Default mock all local subcomponents
 
 describe('CalculatorComponent', () => {
-  let hookSpy: jest.SpyInstance<any, any, any>;
+  let hookSpy: MockInstance<any>;
   // Setup and teardown functions
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     mockProps = { ...defaultMockProps };
     mockHook = { ...defaultMockHook };
-    hookSpy = jest.spyOn(Hook, 'useCalculator');
+    hookSpy = vi.spyOn(Hook, 'useCalculator');
     hookSpy.mockImplementation(() => mockHook);
     // Mock return values for each function that is in the props
-    mockProps.onClick = jest.fn().mockReturnValue(0);
+    mockProps.onClick = vi.fn().mockReturnValue(0);
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     hookSpy.mockRestore();
   });
 
@@ -65,7 +67,7 @@ describe('CalculatorComponent', () => {
     render(<CalculatorComponent {...mockProps} />);
     const input = screen.getByTestId('valueA-input');
     fireEvent.change(input, { target: { value: '1' } });
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(mockHook.onChangeValA).toHaveBeenCalledTimes(1);
   });
 
@@ -73,7 +75,7 @@ describe('CalculatorComponent', () => {
     render(<CalculatorComponent {...mockProps} />);
     const input = screen.getByTestId('valueB-input');
     fireEvent.change(input, { target: { value: '1' } });
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(mockHook.onChangeValB).toHaveBeenCalledTimes(1);
   });
 
@@ -81,7 +83,7 @@ describe('CalculatorComponent', () => {
     render(<CalculatorComponent {...mockProps} />);
     const button = screen.getByTestId('calculate-button');
     fireEvent.click(button);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(mockHook.onClick).toHaveBeenCalledTimes(1);
   });
 });

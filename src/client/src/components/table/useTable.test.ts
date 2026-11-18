@@ -1,9 +1,15 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { act } from 'react';
 
 import Hook, { IUseTableProps } from './useTable';
 import helper from './tableHelper';
 import { mockChangeEvent, mockMouseEvent } from '../../mocks/commonMock';
+
+// No vi.mock('./tableHelper'): the hook's sortReducer/rowsReducer must stay
+// real, and beforeEach() below replaces the three helper functions this file
+// wants mocked by assigning them directly (same net effect CRA's hoisted
+// jest.mock + reassignment produced).
 
 // Default mock props for the hook
 export const defaultMockProps: IUseTableProps = {
@@ -19,7 +25,7 @@ export const defaultMockProps: IUseTableProps = {
   ],
   sortableColumnHeaderIDs: ['id'],
   initRowsPerPage: 10,
-  onChangeTableState: jest.fn(),
+  onChangeTableState: vi.fn(),
 };
 let mockProps = { ...defaultMockProps };
 // Mock props function return values
@@ -47,31 +53,25 @@ const mockHelperReturnValues = {
 // Wrap Tests with file name
 describe('useTable', () => {
   // Setup and teardown functions
-  beforeAll(() => {
-    // Mock helper functions
-    jest.mock('./tableHelper');
-    // Mock any other miscellaneous hooks
-  });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     // Re-mock the props and assign return values to the mock functions
     mockProps = { ...defaultMockProps };
-    mockProps.onChangeTableState = jest
+    mockProps.onChangeTableState = vi
       .fn()
       .mockResolvedValue(mockPropsReturnValues.onChangeTableState);
     // Re-mock the helper functions and assign return values to the mock functions
-    jest.mock('./tableHelper');
-    helper.tableDataValidation = jest.fn();
-    helper.handleOnChangeSort = jest
+    helper.tableDataValidation = vi.fn();
+    helper.handleOnChangeSort = vi
       .fn()
       .mockReturnValue(mockHelperReturnValues.handleOnChangeSort);
-    helper.handleOnChangeRowsPerPage = jest
+    helper.handleOnChangeRowsPerPage = vi
       .fn()
       .mockReturnValue(mockHelperReturnValues.handleOnChangeRowsPerPage);
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // UseEffect Tests
@@ -111,7 +111,7 @@ describe('useTable', () => {
     test('should call helper.handleOnChangeSort with the correct arguments and update sortState', async () => {
       const { result } = renderHook(() => Hook.useTable(mockProps));
       const mockEvent = mockMouseEvent('id');
-      let callState = result.current;
+      const callState = result.current;
       act(() => {
         result.current.onChangeSort(mockEvent);
       });

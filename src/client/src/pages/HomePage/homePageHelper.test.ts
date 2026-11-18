@@ -1,3 +1,13 @@
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+  vi,
+} from 'vitest';
 import { setupServer } from 'msw/node';
 
 import {
@@ -22,12 +32,12 @@ describe('homePageHelper', () => {
     server.close();
   });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     server.resetHandlers();
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Tests

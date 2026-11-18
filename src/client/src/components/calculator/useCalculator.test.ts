@@ -1,13 +1,24 @@
+import { describe, it, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { act } from 'react';
 
 import Hook, { IUseCalculatorProps } from './useCalculator';
 import helper from './calculatorHelper';
-import { mockChangeEvent, mockUseTranslation } from '../../mocks/commonMock';
+import { mockChangeEvent } from '../../mocks/commonMock';
+
+// Vitest hoists module mocks to the top of the file; declare them at the
+// module's top level (Jest used to hoist them out of the setup hooks).
+vi.mock('./calculatorHelper');
+vi.mock('react-i18next', async () => {
+  // imported inside the factory: vi.mock is hoisted above the imports,
+  // so the shared mock may only be reached through a dynamic import
+  const { mockUseTranslation } = await import('../../mocks/commonMock');
+  return { useTranslation: mockUseTranslation };
+});
 
 // Default mock props for the hook
 export const defaultMockProps: IUseCalculatorProps = {
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 let mockProps = { ...defaultMockProps };
 // Mock props function return values
@@ -22,30 +33,21 @@ const mockHelperReturnValues = {
 // Wrap Tests with file name
 describe('useCalculator', () => {
   // Setup and teardown functions
-  beforeAll(() => {
-    // Mock helper functions
-    jest.mock('./calculatorHelper');
-    // Mock any other miscellaneous hooks
-    jest.mock('react-i18next', () => ({
-      useTranslation: mockUseTranslation,
-    }));
-  });
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     // Re-mock the props and assign return values to the mock functions
     mockProps = { ...defaultMockProps };
-    mockProps.onClick = jest
+    mockProps.onClick = vi
       .fn()
       .mockResolvedValue(mockPropsReturnValues.onClick);
     // Re-mock the helper functions and assign return values to the mock functions
-    jest.mock('./calculatorHelper');
-    helper.handleClick = jest
+    helper.handleClick = vi
       .fn()
       .mockResolvedValue(mockHelperReturnValues.handleClick);
   });
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // UseEffect Tests
