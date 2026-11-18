@@ -2,7 +2,6 @@ import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import Hook, { IUseHomePageProps } from './useHomePage';
-import { mockChangeEvent } from '../../mocks/commonMock';
 import helper from './homePageHelper';
 import { TTableArgs } from '../../typescript/ITCommon';
 import { act } from 'react';

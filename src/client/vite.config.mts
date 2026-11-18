@@ -23,6 +23,10 @@ export default defineConfig({
     }),
   ],
   server: {
+    // Pin the IPv4 literal: start-server-and-test polls http://127.0.0.1:3000
+    // and CI runners resolve `localhost` to ::1 first (Node 17+), which left
+    // the listener on [::1]:3000 and failed the e2e gate (PR #30 review).
+    host: '127.0.0.1',
     port: 3000,
     strictPort: true,
     proxy: {
